@@ -1,3 +1,5 @@
+from .open_ai_settings import oaiSettings
+
 from PyQt5.QtWidgets import QPlainTextEdit
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtWidgets import QVBoxLayout
@@ -14,16 +16,12 @@ from PyQt5.QtCore import Qt
 
 import threading
 import requests
-import openai
-import os
-
-
-API_KEY: str = os.environ['OPENAI_API_KEY']
-
-openai.api_key = API_KEY
+import pathlib
 
 
 class OpenAIImageGeneration(QWidget):
+    lastPath: str = ''
+
     def __init__(self, parent) -> None:
         super().__init__(parent)
 
@@ -32,6 +30,8 @@ class OpenAIImageGeneration(QWidget):
         self.scrollArea: QScrollArea = QScrollArea(self)
         self.submit: QPushButton = QPushButton('Выполнить', self)
         self.save: QPushButton = QPushButton('Сохранить', self)
+
+        self.input.setFixedWidth(350)
 
         vBoxLayout: QVBoxLayout = QVBoxLayout(self)
         hBoxLayout: QHBoxLayout = QHBoxLayout()
@@ -67,12 +67,7 @@ class OpenAIImageGeneration(QWidget):
         try:
             self.submit.setDisabled(True)
 
-            response = openai.Image.create(
-                prompt=prompts,
-                n=1,
-                size='1024x1024'
-            )
-
+            response = oaiSettings.makeImage(prompts)
             request = requests.get(response['data'][0]['url'])
 
             image: QImage = QImage()
@@ -87,6 +82,7 @@ class OpenAIImageGeneration(QWidget):
 
     def __saveImage(self):
         fileName = QFileDialog.getSaveFileName(
-            self, 'Сохранить изображение', 'image.png', 'Изображение (*.png)')
+            self, 'Сохранить изображение', f'{self.lastPath}/image.png', 'Изображение (*.png)')
 
+        self.lastPath = str(pathlib.Path(fileName[0]).parent)
         self.label.pixmap().save(fileName[0])

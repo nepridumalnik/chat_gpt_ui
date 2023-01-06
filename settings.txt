@@ -1,0 +1,1 @@
+{"currentEngine": "text-davinci-003", "maxTokens": 3000, "imageResolution": "1024x1024"}

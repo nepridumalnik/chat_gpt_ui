@@ -1,3 +1,5 @@
+from .open_ai_settings import oaiSettings
+
 from PyQt5.QtWidgets import QPlainTextEdit
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtWidgets import QVBoxLayout
@@ -8,13 +10,6 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSignal
 
 import threading
-import openai
-import os
-
-
-API_KEY: str = os.environ['OPENAI_API_KEY']
-
-openai.api_key = API_KEY
 
 
 class OpenAICompletion(QWidget):
@@ -48,17 +43,14 @@ class OpenAICompletion(QWidget):
         t.start()
 
     def __getCompletion(self) -> None:
-        prompts: str = self.input.toPlainText()
-        if not prompts:
+        prompt: str = self.input.toPlainText()
+        if not prompt:
             return
 
         try:
             self.submit.setDisabled(True)
 
-            completion = openai.Completion.create(
-                engine="text-davinci-003", prompt=prompts, max_tokens=3000)
-
-            respond: str = completion.choices[0].text
+            respond: str = oaiSettings.makeCompletion(prompt=prompt)
 
             self.insertTextSignal.emit(f'Ответ:\n{respond}')
         finally:
