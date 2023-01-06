@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QWidget
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtCore import pyqtSignal
 
 import threading
 import openai
@@ -17,6 +18,8 @@ openai.api_key = API_KEY
 
 
 class OpenAICompletion(QWidget):
+    insertTextSignal: pyqtSignal = pyqtSignal([str])
+
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
 
@@ -37,6 +40,7 @@ class OpenAICompletion(QWidget):
         hBoxLayout.addWidget(self.output)
 
         self.submit.clicked.connect(self.__onSubmitClicked)
+        self.insertTextSignal.connect(self.output.insertPlainText)
 
     def __onSubmitClicked(self) -> None:
         t = threading.Thread(target=self.__getCompletion)
@@ -52,10 +56,10 @@ class OpenAICompletion(QWidget):
             self.submit.setDisabled(True)
 
             completion = openai.Completion.create(
-                engine="text-davinci-003", prompt=prompts, max_tokens=2000)
+                engine="text-davinci-003", prompt=prompts, max_tokens=3000)
 
             respond: str = completion.choices[0].text
 
-            self.output.setPlainText(f'Ответ:\n{respond}')
+            self.insertTextSignal.emit(f'Ответ:\n{respond}')
         finally:
             self.submit.setDisabled(False)
