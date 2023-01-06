@@ -40,7 +40,7 @@ class OpenAICompletion(QWidget):
         hBoxLayout.addWidget(self.output)
 
         self.submit.clicked.connect(self.__onSubmitClicked)
-        self.insertTextSignal.connect(self.output.insertPlainText)
+        self.insertTextSignal.connect(self.output.setPlainText)
 
     def __onSubmitClicked(self) -> None:
         t = threading.Thread(target=self.__getCompletion)
