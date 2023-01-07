@@ -25,7 +25,6 @@ HELP: str = '''
 '''
 
 
-@bot.message_handler(commands=['text'])
 def __handleCompletionRequest(message) -> None:
     try:
         if '/text' == message.text:
