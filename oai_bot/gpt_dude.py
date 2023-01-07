@@ -25,20 +25,20 @@ HELP: str = '''
 
 @bot.message_handler(commands=['start', 'help'])
 def __start(message) -> None:
-    bot.reply_to(message.chat.id, HELP)
+    bot.send_message(message.chat.id, HELP)
 
 
 @bot.message_handler(commands=['text'])
 def __text(message) -> None:
     try:
         if '/text' == message.text:
-            bot.reply_to(message, 'Нужен текст')
+            bot.send_message(message.chat.id, 'Нужен текст')
             return
 
         text: str = message.text.split(' ', 1)[1]
-        bot.reply_to(message, 'Ожидайте ответ...')
+        bot.send_message(message.chat.id, 'Ожидайте ответ...')
 
         completion: str = oaiCore.makeCompletion(text)
         bot.reply_to(message, f'Ответ:\n{completion}')
     finally:
-        pass
+        bot.reply_to(message, 'Произошла внутренняя ошибка')
