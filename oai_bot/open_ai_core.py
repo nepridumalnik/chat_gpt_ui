@@ -1,14 +1,15 @@
+from os import environ
+from os import path
 import openai
 import atexit
 import json
-import os
 
 MIN_RESOLUTION: int = 100
 MAX_RESOLUTION: int = 4096
 
 
 class OpenAICore:
-    API_KEY: str = os.environ['OPENAI_API_KEY']
+    API_KEY: str = environ['OPENAI_API_KEY']
     openai.api_key = API_KEY
 
     engineList = openai.Engine.list()
@@ -38,7 +39,7 @@ class OpenAICore:
             f.write(dump)
 
     def __load(self) -> None:
-        if not os.path.isfile(self.__saveFile):
+        if not path.isfile(self.__saveFile):
             return
 
         data: str = ''
