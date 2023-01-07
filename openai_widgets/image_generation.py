@@ -81,8 +81,9 @@ class OpenAIImageGeneration(QWidget):
             self.submit.setDisabled(False)
 
     def __saveImage(self):
+        saveImage: QPixmap = self.label.pixmap()
         fileName = QFileDialog.getSaveFileName(
-            self, 'Сохранить изображение', f'{self.lastPath}/image.png', 'Изображение (*.png)')
+            self, 'Сохранить изображение', f'{self.lastPath}/{self.input.toPlainText()}.png', 'Изображение (*.png)')
 
         self.lastPath = str(pathlib.Path(fileName[0]).parent)
-        self.label.pixmap().save(fileName[0])
+        saveImage.save(fileName[0])
