@@ -20,6 +20,7 @@ bot: TeleBot = TeleBot(token=TELEGRAM_API_TOKEN)
 HELP: str = '''
 Введите /help или /start для получения этой строки
 Введите /text с каким-то текстом для обработки сообщения
+Введите /image с каким-то текстом для генерации изображения
 '''
 
 
@@ -32,13 +33,32 @@ def __start(message) -> None:
 def __text(message) -> None:
     try:
         if '/text' == message.text:
-            bot.send_message(message.chat.id, 'Нужен текст')
+            bot.send_message(message.chat.id, 'Требуется текст для обработки')
             return
 
-        text: str = message.text.split(' ', 1)[1]
+        prompts: str = message.text.split(' ', 1)[1]
         bot.send_message(message.chat.id, 'Ожидайте ответ...')
 
-        completion: str = oaiCore.makeCompletion(text)
+        completion: str = oaiCore.makeCompletion(prompts)
         bot.reply_to(message, f'Ответ:\n{completion}')
-    finally:
-        bot.reply_to(message, 'Произошла внутренняя ошибка')
+    except Exception as e:
+        bot.reply_to(message, f'Произошла внутренняя ошибка: {e}')
+
+
+@bot.message_handler(commands=['image'])
+def __image(message) -> None:
+    try:
+        if '/image' == message.text:
+            bot.send_message(
+                message.chat.id, 'Требуется описание для обработки')
+            return
+
+        prompts: str = message.text.split(' ', 1)[1]
+        bot.send_message(message.chat.id, 'Ожидайте ответ...')
+
+        response = oaiCore.makeImage(prompts)
+        uri: str = response['data'][0]['url']
+
+        bot.send_photo(message.chat.id, photo=uri, caption=prompts)
+    except Exception as e:
+        bot.reply_to(message, f'Произошла внутренняя ошибка: {e}')
