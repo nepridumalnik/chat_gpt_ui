@@ -1,4 +1,4 @@
-from .open_ai_settings import oaiSettings
+from .open_ai_core import oaiCore
 
 from PyQt5.QtWidgets import QPlainTextEdit
 from PyQt5.QtWidgets import QPushButton
@@ -67,7 +67,7 @@ class OpenAIImageGeneration(QWidget):
         try:
             self.submit.setDisabled(True)
 
-            response = oaiSettings.makeImage(prompts)
+            response = oaiCore.makeImage(prompts)
             request = requests.get(response['data'][0]['url'])
 
             image: QImage = QImage()

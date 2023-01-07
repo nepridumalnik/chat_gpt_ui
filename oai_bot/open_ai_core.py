@@ -7,7 +7,7 @@ MIN_RESOLUTION: int = 100
 MAX_RESOLUTION: int = 4096
 
 
-class OpenAISettings:
+class OpenAICore:
     API_KEY: str = os.environ['OPENAI_API_KEY']
     openai.api_key = API_KEY
 
@@ -98,4 +98,4 @@ class OpenAISettings:
         return engines
 
 
-oaiSettings: OpenAISettings = OpenAISettings()
+oaiCore: OpenAICore = OpenAICore()

@@ -1,5 +1,5 @@
 if '__main__' == __name__:
-    from openai_widgets import OpenAIApi
+    from oai_bot import OpenAIApi
     from PyQt5.QtWidgets import QApplication
 
     app: QApplication = QApplication([])

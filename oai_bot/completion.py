@@ -1,4 +1,4 @@
-from .open_ai_settings import oaiSettings
+from .open_ai_core import oaiCore
 
 from PyQt5.QtWidgets import QPlainTextEdit
 from PyQt5.QtWidgets import QPushButton
@@ -50,7 +50,7 @@ class OpenAICompletion(QWidget):
         try:
             self.submit.setDisabled(True)
 
-            respond: str = oaiSettings.makeCompletion(prompt=prompt)
+            respond: str = oaiCore.makeCompletion(prompt=prompt)
 
             self.insertTextSignal.emit(f'Ответ:\n{respond}')
         finally:
