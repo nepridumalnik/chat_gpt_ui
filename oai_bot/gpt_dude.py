@@ -18,6 +18,10 @@ gptDudeBot: GPTDudeBot = GPTDudeBot()
 TELEGRAM_API_TOKEN: str = environ['TELEGRAM_API_TOKEN']
 bot: TeleBot = TeleBot(token=TELEGRAM_API_TOKEN)
 
+PROCESSING: str = 'Обработка запроса...'
+NEEDS_DESCRIPTION: str = 'Нужно описание'
+INTERNAL_ERROR: str = 'Произошла внутренняя ошибка: {}'
+
 HELP: str = '''
 Введите /help или /start для получения этой строки
 Введите /text с каким-то текстом для обработки сообщения
@@ -28,34 +32,34 @@ HELP: str = '''
 def __handleCompletionRequest(message) -> None:
     try:
         if '/text' == message.text:
-            bot.send_message(message.chat.id, 'Требуется текст для обработки')
+            bot.send_message(message.chat.id, NEEDS_DESCRIPTION)
             return
 
         prompts: str = message.text.split(' ', 1)[1]
-        bot.send_message(message.chat.id, 'Ожидайте ответ...')
+        bot.send_message(message.chat.id, PROCESSING)
 
         completion: str = oaiCore.makeCompletion(prompts)
         bot.reply_to(message, f'Ответ:\n{completion}')
     except Exception as e:
-        bot.reply_to(message, f'Произошла внутренняя ошибка: {e}')
+        bot.reply_to(message, INTERNAL_ERROR.format(e))
 
 
 def __handleImageRequest(message) -> None:
     try:
         if '/image' == message.text:
             bot.send_message(
-                message.chat.id, 'Требуется описание для обработки')
+                message.chat.id, NEEDS_DESCRIPTION)
             return
 
         prompts: str = message.text.split(' ', 1)[1]
-        bot.send_message(message.chat.id, 'Ожидайте ответ...')
+        bot.send_message(message.chat.id, PROCESSING)
 
         response = oaiCore.makeImage(prompts)
         uri: str = response['data'][0]['url']
 
         bot.send_photo(message.chat.id, photo=uri, caption=prompts)
     except Exception as e:
-        bot.reply_to(message, f'Произошла внутренняя ошибка: {e}')
+        bot.reply_to(message, INTERNAL_ERROR.format(e))
 
 
 @bot.message_handler(commands=['image'])
