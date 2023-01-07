@@ -1,6 +1,7 @@
 from .open_ai_core import oaiCore
 
 from telebot import TeleBot
+from threading import Thread
 from os import environ
 
 
@@ -24,13 +25,8 @@ HELP: str = '''
 '''
 
 
-@bot.message_handler(commands=['start', 'help'])
-def __start(message) -> None:
-    bot.send_message(message.chat.id, HELP)
-
-
 @bot.message_handler(commands=['text'])
-def __text(message) -> None:
+def __handleCompletionRequest(message) -> None:
     try:
         if '/text' == message.text:
             bot.send_message(message.chat.id, 'Требуется текст для обработки')
@@ -45,8 +41,7 @@ def __text(message) -> None:
         bot.reply_to(message, f'Произошла внутренняя ошибка: {e}')
 
 
-@bot.message_handler(commands=['image'])
-def __image(message) -> None:
+def __handleImageRequest(message) -> None:
     try:
         if '/image' == message.text:
             bot.send_message(
@@ -62,3 +57,26 @@ def __image(message) -> None:
         bot.send_photo(message.chat.id, photo=uri, caption=prompts)
     except Exception as e:
         bot.reply_to(message, f'Произошла внутренняя ошибка: {e}')
+
+
+@bot.message_handler(commands=['image'])
+def __image(message) -> None:
+    t = Thread(target=__handleImageRequest,
+               kwargs={'message': message})
+
+    t.daemon = True
+    t.start()
+
+
+@bot.message_handler(commands=['text'])
+def __text(message) -> None:
+    t = Thread(target=__handleCompletionRequest,
+               kwargs={'message': message})
+
+    t.daemon = True
+    t.start()
+
+
+@bot.message_handler(commands=['start', 'help'])
+def __start(message) -> None:
+    bot.send_message(message.chat.id, HELP)
