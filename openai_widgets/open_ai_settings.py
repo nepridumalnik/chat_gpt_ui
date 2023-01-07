@@ -38,6 +38,9 @@ class OpenAISettings:
             f.write(dump)
 
     def __load(self) -> None:
+        if not os.path.isfile(self.__saveFile):
+            return
+
         data: str = ''
         with open(self.__saveFile, 'r') as f:
             data = f.read()
