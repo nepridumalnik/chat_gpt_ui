@@ -1,4 +1,4 @@
-from .open_ai_core import oaiCore
+from ..oai_core.open_ai_core import oaiCore
 
 from PyQt5.QtWidgets import QPlainTextEdit
 from PyQt5.QtWidgets import QPushButton
